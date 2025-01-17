@@ -7,15 +7,14 @@ const authMiddleware = require('../Middlewares/Auth.middlewares');
 
 router.post('/register', [
     body('email').isEmail().withMessage('Invalid Email'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),
+    body('username').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-    body('vehicle.color').isLength({ min: 3 }).withMessage('Color must be at least 3 characters long'),
-    body('vehicle.plate').isLength({ min: 3 }).withMessage('Plate must be at least 3 characters long'),
-    body('vehicle.capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
-    body('vehicle.vehicleType').isIn([ 'car', 'motorcycle', 'auto' ]).withMessage('Invalid vehicle type')
-],
+    body('phoneno').isLength({ min: 10 }).withMessage('Phone number must be at least 10 characters long'),
+    body('adharno').isLength({ min: 3  }).withMessage('Adhar number must be at least 3 characters long'),
+    body('location').isLength({ min: 3 }).withMessage('location must be at least 3 characters long')
+],  
     captainController.registerCaptain
-)
+)   
 
 
 router.post('/login', [
@@ -28,7 +27,8 @@ router.post('/login', [
 
 router.get('/profile', authMiddleware.authCaptain, captainController.getCaptainProfile)
 
-router.get('/logout', authMiddleware.authCaptain, captainController.logoutCaptain)
+router.post('/logout', authMiddleware.authCaptain, captainController.logoutCaptain)
 
+router.post('/Rides', authMiddleware.authCaptain, captainController.getCaptainsByLocation);
 
 module.exports = router;
