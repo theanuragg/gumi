@@ -34,31 +34,47 @@ module.exports.authUser = async (req, res, next) => {
 }
 
 module.exports.authCaptain = async (req, res, next) => {
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[ 1 ];
-
-    console.log(token);
-
-    // if (!token) {
-    //     return res.status(401).json({ message: 'Unauthorized3' });
-    // }
-
-    const isBlacklisted = await blackListTokenModel.findOne({ token: token });
-
-    console.log(isBlacklisted);
-
-    if (isBlacklisted) {
-        return res.status(401).json({ message: 'Unauthorized4' });
-    }
-
     try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+        console.log(token);
+
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized3' });
+        }
+
+        let isBlacklisted;
+        try {
+            isBlacklisted = await blackListTokenModel.findOne({ token: token });
+        } catch (dbError) {
+            console.error("Error checking token blacklist:", dbError);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+        console.log(isBlacklisted);
+
+        if (isBlacklisted) {
+            return res.status(401).json({ message: 'Unauthorized4' });
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const captain = await captainModel.findById(decoded._id)
+
+        let captain;
+        try {
+            captain = await captainModel.findById(decoded._id);
+        } catch (dbError) {
+            console.error("Error finding captain:", dbError);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+        if (!captain) {
+            return res.status(404).json({ message: 'Captain not found' });
+        }
+
         req.captain = captain;
-
-        return next()
+        next();
     } catch (err) {
-        console.log(err);
-
-        res.status(401).json({ message: 'Unauthorized5' });
+        console.error("Authorization Error:", err);
+        return res.status(401).json({ message: 'Unauthorized5' });
     }
-}
+};
