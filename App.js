@@ -4,11 +4,11 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const cookieParser = require('cookie-parser');
-const connectToDb = require('./db/db');
+const connectDB = require('./db/db');
 const userRoutes = require('./Route/user.route');
 const captainRoutes = require('./Route/captain.route');
 
-connectToDb();
+connectDB();
 
 app.use(cors({
     origin: '*', 
