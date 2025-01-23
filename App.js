@@ -11,7 +11,7 @@ const captainRoutes = require('./Route/captain.route');
 connectToDb();
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Replace with your frontend URL
+    origin: '*', 
     credentials: true
 }));
 app.use(express.json());
